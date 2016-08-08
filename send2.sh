@@ -5,7 +5,7 @@ PROXY=$2
 IP_LIST=$3
 BASE_DIR=$4
 
-if [ ${BASE_DIR} = "" ];then
+if [ "${BASE_DIR}" == "" ];then
     BASE_DIR=/var/www/
 fi
 
