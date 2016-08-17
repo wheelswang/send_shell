@@ -13,9 +13,14 @@ SEND_TMP_FILE=send_tmp.tar.gz
 SEND_TMP_DIR=/tmp/
 CUR_DIR=`pwd`
 
-echo "对文件列表压缩打包"
 cd ${BASE_DIR}
+
+echo "更改文件权限"
+cat ${CUR_DIR}/${FILE_LIST} | xargs chown code:root
+
+echo "对文件列表压缩打包"
 cat ${CUR_DIR}/${FILE_LIST} | xargs tar -cvzf ${SEND_TMP_DIR}${SEND_TMP_FILE}
+
 cd ${CUR_DIR}
 
 echo "发送到中转机器临时目录"

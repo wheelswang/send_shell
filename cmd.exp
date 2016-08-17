@@ -5,19 +5,25 @@ set USER [lindex $argv 1]
 set PASS [lindex $argv 2]
 set CMMD [lindex $argv 3]
 
+set timeout 30
+
 spawn ssh -oStrictHostKeyChecking=no -q -l$USER ${ADDR}
-set timeout 100000
+expect *assword*
+send "${PASS}\r"
+
 expect {
-	"*yes*no*"  { send "yes\r" }
-	"*assword*" {
-		send "${PASS}"
-		send "\r"
-		}
+    timeout {puts "ssh timeout";exit 1}
+    -re "(${USER}@.*:.*)\[\$#]" {
+        set PS1 $expect_out(1,string)
+        send "${CMMD}\r"
+    }
 }
 
-expect "root@*:~#"
-send "${CMMD}\r"
+expect {
+    timeout {puts "execute command timeout";exit 1}
+    $PS1 {send "exit\r"}
+}
 
-expect "root@*:~#"
+expect eof
 puts "excute ${CMMD} on $ADDR ok!\r"
 exit 0

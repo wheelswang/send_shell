@@ -6,30 +6,13 @@ set PASS [lindex $argv 2]
 set TODO [lindex $argv 3]
 set CPTO [lindex $argv 4]
 
-#spawn ssh -oStrictHostKeyChecking=no -q ${USER}@${ADDR}
-#set timeout 100000
-#expect {
-#	"*yes*no*"  { send "yes\r" }
-#	"*assword*" {
-#		send "${PASS}"
-#		send "\r"
-#		}
-#}
+set timeout 30
 
-#expect "root@*:~#"
-#send "mkdir -p ${CPTO}; ulimit -c 10000000\r"
-
-#expect "root@*:~#"
 spawn scp -oStrictHostKeyChecking=no -r ${TODO} ${USER}@${ADDR}:${CPTO}
-set timeout 100000
-expect {
-	"*yes*no*"  { send "yes\r" }
-	"*assword*" {
-		send "${PASS}"
-		send "\r"
-		}
-}
+expect *assword*
+send "${PASS}\r"
 
-expect "root@*:~#"
-puts "send ${TODO} to ${ADDR}:${CPTO} ok!\r"
-exit 0
+expect {
+    timeout {puts "scp timeout";exit 1}
+    eof {puts "send ${TODO} to ${ADDR}:${CPTO} ok!";exit 0}
+}
